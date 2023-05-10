@@ -2,7 +2,6 @@
 
 import { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Conversation, Message, User } from "@prisma/client";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
 import { useSession } from "next-auth/react";
@@ -57,11 +56,15 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({ data, selected }) => 
 		}
 
 		if (lastMessage?.body) {
-			return lastMessage.body;
+			if (lastMessage.sender.id !== otherUser.id) {
+				return `Eu: ${lastMessage.body}`;
+			} else {
+				return lastMessage.body;
+			}
 		}
 
 		return "Iniciou uma conversa";
-	}, [lastMessage]);
+	}, [lastMessage, otherUser.id]);
 
 	const handleClick = useCallback(() => {
 		router.push(`/conversations/${data.id}`);

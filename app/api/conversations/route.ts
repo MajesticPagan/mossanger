@@ -91,7 +91,7 @@ export async function POST(request: Request) {
 
 		return NextResponse.json(newConversation);
 	} catch (error: any) {
-		console.error(error, "REGISTRATION_ERROR");
+		console.error(error, "CONVERSATION_ERROR");
 		return new NextResponse("Erro interno.", { status: 500 });
 	}
 }
