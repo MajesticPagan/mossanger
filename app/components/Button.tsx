@@ -14,7 +14,7 @@ interface ButtonProps {
 
 const Button: React.FC<ButtonProps> = ({
 	children,
-	type,
+	type = "button",
 	fullWidth,
 	secondary,
 	danger,

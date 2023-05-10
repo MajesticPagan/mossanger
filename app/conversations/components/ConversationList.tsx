@@ -24,6 +24,16 @@ const ConversationList: React.FC<ConversationListProps> = ({ initialItems }) => 
 		isOpen ? "hidden" : "block w-full left-0"
 	);
 
+	let renderedItems: React.ReactNode = (
+		<p className="text-sm text-gray-500 italic">Não existem mensagens.</p>
+	);
+
+	if (initialItems.length > 0) {
+		renderedItems = items.map((item) => (
+			<ConversationBox key={item.id} data={item} selected={conversationId === item.id} />
+		));
+	}
+
 	return (
 		<aside className={listClasses}>
 			<div className="px-5">
@@ -36,13 +46,7 @@ const ConversationList: React.FC<ConversationListProps> = ({ initialItems }) => 
 						<MdOutlineGroupAdd size={20} />
 					</button>
 				</div>
-				{items.map((item) => (
-					<ConversationBox
-						key={item.id}
-						data={item}
-						selected={conversationId === item.id}
-					/>
-				))}
+				{renderedItems}
 			</div>
 		</aside>
 	);

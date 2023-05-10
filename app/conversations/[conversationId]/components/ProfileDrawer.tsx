@@ -10,7 +10,7 @@ import { Conversation, User } from "@prisma/client";
 
 import useOtherUser from "@/app/hooks/useOtherUser";
 
-import Modal from "@/app/components/Modal";
+import ConfirmModal from "./ConfirmModal";
 import Avatar from "@/app/components/Avatar";
 
 interface ProfileDrawerProps {
@@ -22,7 +22,7 @@ interface ProfileDrawerProps {
 }
 
 const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ data, isOpen, onClose }) => {
-	const [modalOpen, setModalOpen] = useState(false);
+	const [confirmOpen, setConfirmOpen] = useState(false);
 	const otherUser = useOtherUser(data);
 
 	const joinedDate = useMemo(() => {
@@ -45,21 +45,17 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ data, isOpen, onClose }) 
 		return "Ativo";
 	}, [data]);
 
-	const handleOnModalOpen = () => {
-		setModalOpen(true);
+	const handleConfirmOpen = () => {
+		setConfirmOpen(true);
 	};
 
-	const handleOnModalClose = () => {
-		setModalOpen(false);
+	const handleConfirmClose = () => {
+		setConfirmOpen(false);
 	};
 
 	return (
 		<>
-			<Modal isOpen={modalOpen} onClose={handleOnModalClose}>
-				<div className="p-5 bg-white">
-					<p>Hello!</p>
-				</div>
-			</Modal>
+			<ConfirmModal isOpen={confirmOpen} onClose={handleConfirmClose} />
 
 			<Transition.Root show={isOpen} as={Fragment}>
 				<Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -120,7 +116,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ data, isOpen, onClose }) 
 														<button
 															type="button"
 															className="flex flex-col items-center gap-3 cursor-pointer transition hover:opacity-75"
-															onClick={handleOnModalOpen}
+															onClick={handleConfirmOpen}
 														>
 															<span className="w-10 h-10 flex items-center justify-center rounded-full bg-neutral-100">
 																<IoTrash

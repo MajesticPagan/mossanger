@@ -4,6 +4,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import axios from "axios";
 import { HiPaperAirplane, HiPhoto } from "react-icons/hi2";
 import { CldUploadButton } from "next-cloudinary";
+import { toast } from "react-hot-toast";
 
 import useConversation from "@/app/hooks/useConversation";
 
@@ -26,17 +27,21 @@ const Form = () => {
 	const onSubmit: SubmitHandler<FieldValues> = (data) => {
 		setValue("message", "", { shouldValidate: true });
 
-		axios.post("/api/messages", {
-			...data,
-			conversationId,
-		});
+		axios
+			.post("/api/messages", {
+				...data,
+				conversationId,
+			})
+			.catch((error) => toast.error(`Ocorreu algo de errado: ${error.response.data}`));
 	};
 
 	const handleUpload = (result: any) => {
-		axios.post("/api/messages/", {
-			image: result?.info?.secure_url,
-			conversationId,
-		});
+		axios
+			.post("/api/messages/", {
+				image: result?.info?.secure_url,
+				conversationId,
+			})
+			.catch((error) => toast.error(`Ocorreu algo de errado: ${error.response.data}`));
 	};
 
 	return (
