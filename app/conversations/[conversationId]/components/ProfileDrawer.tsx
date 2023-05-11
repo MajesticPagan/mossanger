@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react";
 import { Conversation, User } from "@prisma/client";
 
 import useOtherUser from "@/app/hooks/useOtherUser";
+import useActiveList from "@/app/hooks/useActiveList";
 
 import ConfirmModal from "./ConfirmModal";
 import Avatar from "@/app/components/Avatar";
@@ -27,6 +28,8 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ data, isOpen, onClose }) 
 	const [confirmOpen, setConfirmOpen] = useState(false);
 	const otherUser = useOtherUser(data);
 	const session = useSession();
+	const { members } = useActiveList();
+	const isActive = members.indexOf(otherUser?.email!) !== -1;
 
 	const joinedDate = useMemo(() => {
 		return format(new Date(otherUser.createdAt), "PP", { locale: pt });
@@ -45,10 +48,10 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ data, isOpen, onClose }) 
 			return `${data.users.length} membros`;
 		}
 
-		return "Ativo";
-	}, [data]);
+		return isActive ? 'Ativo' : 'Offline';
+	}, [data, isActive]);
 
-	const members = useMemo(() => {
+	const memberList = useMemo(() => {
 		return data.users
 			.map((user) => (user.email === session.data?.user?.email ? "Eu" : user.name))
 			.join(", ");
@@ -182,7 +185,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ data, isOpen, onClose }) 
 																	Membros
 																</dt>
 																<dd className="mt-1 text-sm text-gray-900 sm:col-span-2">
-																	{members}
+																	{memberList}
 																</dd>
 															</div>
 														</>
