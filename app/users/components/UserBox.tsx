@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import clsx from "clsx";
 
 import { User } from "@prisma/client";
 
@@ -16,6 +17,11 @@ interface UserBoxProps {
 const UserBox: React.FC<UserBoxProps> = ({ data }) => {
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
+
+	const boxClasses = clsx(
+		"relative w-full flex items-center space-x-3 p-3 rounded-lg transition cursor-pointer bg-white hover:bg-neutral-100",
+		isLoading && "opacity-75"
+	);
 
 	const handleClick = useCallback(() => {
 		setIsLoading(true);
@@ -30,10 +36,7 @@ const UserBox: React.FC<UserBoxProps> = ({ data }) => {
 	}, [data.id, router]);
 
 	return (
-		<article
-			onClick={handleClick}
-			className="relative w-full flex items-center space-x-3 p-3 rounded-lg transition cursor-pointer bg-white hover:bg-neutral-100"
-		>
+		<article onClick={handleClick} className={boxClasses}>
 			<Avatar user={data} />
 			<div className="min-w-0 flex-1">
 				<div className="focus:outline-none">

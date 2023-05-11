@@ -2,67 +2,55 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { Field, FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { signOut } from "next-auth/react";
 
 import { User } from "@prisma/client";
 
 import Modal from "./Modal";
 import Input from "../inputs/Input";
-import ImageInput from "../inputs/ImageInput";
+import Select from "../inputs/Select";
 import Button from "../Button";
 
-interface SettingsModalProps {
-	currentUser: User;
+interface GroupChatModalProps {
 	isOpen?: boolean;
+	users: User[];
 	onClose: () => void;
 }
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ currentUser, isOpen, onClose }) => {
+const GroupChatModal: React.FC<GroupChatModalProps> = ({ isOpen, users, onClose }) => {
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
-	const [currentUserEmail, setCurrentUserEmail] = useState(currentUser?.email);
 
 	const {
-		register,
 		handleSubmit,
 		setValue,
 		watch,
+		register,
 		formState: { errors },
 	} = useForm<FieldValues>({
 		defaultValues: {
-			name: currentUser?.name,
-			image: currentUser?.image,
-			email: currentUser?.email,
+			name: "",
+			members: [],
 		},
 	});
 
-	const image = watch("image");
-
-	const handleUpload = (result: any) => {
-		setValue("image", result?.info?.secure_url, { shouldValidate: true });
-	};
+	const members = watch("members");
 
 	const onSubmit: SubmitHandler<FieldValues> = (data) => {
 		setIsLoading(true);
 
 		axios
-			.post("/api/settings", data)
+			.post("/api/conversations", {
+				...data,
+				isGroup: true,
+			})
 			.then(({ data }) => {
-				if (data.email !== currentUserEmail) {
-					toast.error(
-						"Alterou o email da sua conta, por favor inicie a sessão novamente."
-					);
-					setTimeout(() => {
-						signOut();
-					}, 2000);
-				} else {
-					router.refresh();
-					onClose();
-					toast.success("Perfil atualizado com sucesso.");
-				}
+				onClose();
+				toast.success("Conversa de grupo criada com sucesso.");
+				router.refresh();
+				router.push(`/conversations/${data.id}`);
 			})
 			.catch((error) => toast.error(`Ocorreu algo de errado: ${error.response.data}`))
 			.finally(() => setIsLoading(false));
@@ -72,37 +60,36 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ currentUser, isOpen, onCl
 		<Modal isOpen={isOpen} onClose={onClose}>
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<div className="space-y-12">
-					<div className="border-b border-gray-900/10 pb-12">
-						<h2 className="text-base font-semibold leading-7 text-gray-900">Perfil</h2>
+					<div className="pb-12 border-b border-gray-900/10">
+						<h2 className="text-base font-semibold leading-7 text-gray-900">
+							Criar conversa de grupo
+						</h2>
 						<p className="mt-1 text-sm leading-6 text-gray-500">
-							Altere dados relacionados com o seu perfil.
+							Crie uma conversa com mais de 2 pessoas.
 						</p>
 
 						<div className="flex flex-col gap-y-8 mt-10">
 							<Input
 								label="Nome"
 								id="name"
+								placeholder="Jantar de Sábado"
 								disabled={isLoading}
 								errors={errors}
 								register={register}
 								required
 							/>
-							<Input
-								label="Email"
-								id="email"
-								type="email"
+							<Select
+								label="Membros"
 								disabled={isLoading}
-								errors={errors}
-								register={register}
+								options={users.map((user) => ({
+									value: user.id,
+									label: user.name,
+								}))}
+								onChange={(value) =>
+									setValue("members", value, { shouldValidate: true })
+								}
+								value={members}
 								required
-							/>
-							<ImageInput
-								label="Foto"
-								placeholder={image || currentUser?.image}
-								disabled={isLoading}
-								errors={errors}
-								register={register}
-								onUpload={handleUpload}
 							/>
 						</div>
 					</div>
@@ -121,4 +108,4 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ currentUser, isOpen, onCl
 	);
 };
 
-export default SettingsModal;
+export default GroupChatModal;
