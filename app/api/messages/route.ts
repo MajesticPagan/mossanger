@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import prisma from "@/app/libs/prismadb";
+import { pusherServer } from "@/app/libs/pusher";
 
 import getCurrentUser from "@/app/actions/getCurrentUser";
 
@@ -41,7 +42,6 @@ export async function POST(request: Request) {
 		});
 
 		// Update conversation state with the new message
-
 		const updateConversation = await prisma.conversation.update({
 			where: {
 				id: conversationId,
@@ -62,6 +62,19 @@ export async function POST(request: Request) {
 					},
 				},
 			},
+		});
+
+		// Pusher: publish new message event on the the current conversation channel
+		await pusherServer.trigger(conversationId, "messages:new", newMessage);
+
+		const lastMessage = updateConversation.messages[updateConversation.messages.length - 1];
+
+		// Pusher: publish conversation update on the all the user channels
+		updateConversation.users.map((user) => {
+			pusherServer.trigger(user.email!, "conversation:update", {
+				id: conversationId,
+				messages: [lastMessage],
+			});
 		});
 
 		return NextResponse.json(newMessage);

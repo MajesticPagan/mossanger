@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import prisma from "@/app/libs/prismadb";
+import { pusherServer } from "@/app/libs/pusher";
 
 import getCurrentUser from "@/app/actions/getCurrentUser";
 
@@ -17,9 +18,8 @@ export async function POST(request: Request) {
 		if (isGroup && (!members || members.length < 2 || !name)) {
 			return new NextResponse("Informação inválida.", { status: 400 });
 		}
-		
-		// Creating a new conversation group
 
+		// Creating a new conversation group
 		if (isGroup) {
 			const newConversation = await prisma.conversation.create({
 				data: {
@@ -41,11 +41,17 @@ export async function POST(request: Request) {
 				},
 			});
 
+			// Pusher: publish new conversation event on the all the user channels
+			newConversation.users.forEach((user) => {
+				if (user.email) {
+					pusherServer.trigger(user.email, "conversation:new", newConversation);
+				}
+			});
+
 			return NextResponse.json(newConversation);
 		}
 
 		// Check if there is an existing conversation between 2 users
-
 		const existingConversations = await prisma.conversation.findMany({
 			where: {
 				OR: [
@@ -70,7 +76,6 @@ export async function POST(request: Request) {
 		}
 
 		// Creating a conversation between 2 users
-
 		const newConversation = await prisma.conversation.create({
 			data: {
 				users: {
@@ -87,6 +92,13 @@ export async function POST(request: Request) {
 			include: {
 				users: true,
 			},
+		});
+
+		// Pusher: Publish new conversation event on all users channels
+		newConversation.users.map((user) => {
+			if (user.email) {
+				pusherServer.trigger(user.email, "conversation:new", newConversation);
+			}
 		});
 
 		return NextResponse.json(newConversation);

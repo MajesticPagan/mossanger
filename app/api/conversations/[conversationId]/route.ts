@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import prisma from "@/app/libs/prismadb";
+import { pusherServer } from "@/app/libs/pusher";
 
 import getCurrentUser from "@/app/actions/getCurrentUser";
 
@@ -37,6 +38,16 @@ export async function DELETE(request: Request, { params }: { params: IParams }) 
 					hasSome: [currentUser.id],
 				},
 			},
+		});
+
+		// Pusher: Publish conversation removed event to all user channels
+		existingConversation.users.forEach((user) => {
+			if (user.email) {
+				pusherServer.trigger(user.email, "conversation:delete", {
+					deletedBy: currentUser,
+					conversation: existingConversation,
+				});
+			}
 		});
 
 		return NextResponse.json(deletedConversation);

@@ -56,8 +56,10 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({ data, selected }) => 
 			return "Enviou uma mensagem";
 		}
 
+		console.log(lastMessage);
+
 		if (lastMessage?.body) {
-			if (lastMessage.sender.id !== otherUser.id) {
+			if (lastMessage.senderId !== otherUser.id) {
 				return `Eu: ${lastMessage.body}`;
 			} else {
 				return lastMessage.body;

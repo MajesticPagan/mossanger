@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import prisma from "@/app/libs/prismadb";
+import { pusherServer } from "@/app/libs/pusher";
 
 import getCurrentUser from "@/app/actions/getCurrentUser";
 
@@ -61,6 +62,19 @@ export async function POST(request: Request, { params }: { params: IParams }) {
 				},
 			},
 		});
+
+		// Pusher: Publish conversation update event on the current user channel
+		await pusherServer.trigger(currentUser.email, "conversation:update", {
+			id: conversationId,
+			messages: [updateMessage],
+		});
+
+		if (lastMessage.seenIds.indexOf(currentUser.id) !== -1) {
+			return NextResponse.json(conversation);
+		}
+
+		// Pusher: Publish message update event on the conversation channel (seen message)
+		await pusherServer.trigger(conversationId!, "messages:update", updateMessage);
 
 		return NextResponse.json(updateMessage);
 	} catch (error: any) {
