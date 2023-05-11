@@ -8,6 +8,7 @@ import clsx from "clsx";
 
 import { User } from "@prisma/client";
 
+import Loader from "@/app/components/Loader";
 import Avatar from "@/app/components/Avatar";
 
 interface UserBoxProps {
@@ -36,16 +37,20 @@ const UserBox: React.FC<UserBoxProps> = ({ data }) => {
 	}, [data.id, router]);
 
 	return (
-		<article onClick={handleClick} className={boxClasses}>
-			<Avatar user={data} />
-			<div className="min-w-0 flex-1">
-				<div className="focus:outline-none">
-					<div className="flex justify-between items-center mb-1">
-						<h4 className="text-sm font-medium text-gray-900">{data.name}</h4>
+		<>
+			{isLoading && <Loader />}
+
+			<article onClick={handleClick} className={boxClasses}>
+				<Avatar user={data} />
+				<div className="min-w-0 flex-1">
+					<div className="focus:outline-none">
+						<div className="flex justify-between items-center mb-1">
+							<h4 className="text-sm font-medium text-gray-900">{data.name}</h4>
+						</div>
 					</div>
 				</div>
-			</div>
-		</article>
+			</article>
+		</>
 	);
 };
 

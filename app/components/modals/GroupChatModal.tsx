@@ -12,6 +12,7 @@ import Modal from "./Modal";
 import Input from "../inputs/Input";
 import Select from "../inputs/Select";
 import Button from "../Button";
+import Loader from "../Loader";
 
 interface GroupChatModalProps {
 	isOpen?: boolean;
@@ -57,54 +58,58 @@ const GroupChatModal: React.FC<GroupChatModalProps> = ({ isOpen, users, onClose 
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose}>
-			<form onSubmit={handleSubmit(onSubmit)}>
-				<div className="space-y-12">
-					<div className="pb-12 border-b border-gray-900/10">
-						<h2 className="text-base font-semibold leading-7 text-gray-900">
-							Criar conversa de grupo
-						</h2>
-						<p className="mt-1 text-sm leading-6 text-gray-500">
-							Crie uma conversa com mais de 2 pessoas.
-						</p>
+		<>
+			{isLoading && <Loader />}
 
-						<div className="flex flex-col gap-y-8 mt-10">
-							<Input
-								label="Nome"
-								id="name"
-								placeholder="Jantar de Sábado"
-								disabled={isLoading}
-								errors={errors}
-								register={register}
-								required
-							/>
-							<Select
-								label="Membros"
-								disabled={isLoading}
-								options={users.map((user) => ({
-									value: user.id,
-									label: user.name,
-								}))}
-								onChange={(value) =>
-									setValue("members", value, { shouldValidate: true })
-								}
-								value={members}
-								required
-							/>
+			<Modal isOpen={isOpen} onClose={onClose}>
+				<form onSubmit={handleSubmit(onSubmit)}>
+					<div className="space-y-12">
+						<div className="pb-12 border-b border-gray-900/10">
+							<h2 className="text-base font-semibold leading-7 text-gray-900">
+								Criar conversa de grupo
+							</h2>
+							<p className="mt-1 text-sm leading-6 text-gray-500">
+								Crie uma conversa com mais de 2 pessoas.
+							</p>
+
+							<div className="flex flex-col gap-y-8 mt-10">
+								<Input
+									label="Nome"
+									id="name"
+									placeholder="Jantar de Sábado"
+									disabled={isLoading}
+									errors={errors}
+									register={register}
+									required
+								/>
+								<Select
+									label="Membros"
+									disabled={isLoading}
+									options={users.map((user) => ({
+										value: user.id,
+										label: user.name,
+									}))}
+									onChange={(value) =>
+										setValue("members", value, { shouldValidate: true })
+									}
+									value={members}
+									required
+								/>
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<div className="flex items-center justify-end gap-x-6 mt-6">
-					<Button disabled={isLoading} onClick={onClose} secondary>
-						Cancelar
-					</Button>
-					<Button type="submit" disabled={isLoading} onClick={onClose}>
-						Guardar
-					</Button>
-				</div>
-			</form>
-		</Modal>
+					<div className="flex items-center justify-end gap-x-6 mt-6">
+						<Button disabled={isLoading} onClick={onClose} secondary>
+							Cancelar
+						</Button>
+						<Button type="submit" disabled={isLoading} onClick={onClose}>
+							Guardar
+						</Button>
+					</div>
+				</form>
+			</Modal>
+		</>
 	);
 };
 

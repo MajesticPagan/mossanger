@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import Input from "@/app/components/inputs/Input";
 import Button from "@/app/components/Button";
 import AuthSocialButton from "./AuthSocialButton";
+import Loader from "@/app/components/Loader";
 
 type Variant = "LOGIN" | "REGISTER";
 
@@ -93,71 +94,81 @@ const AuthForm = () => {
 	};
 
 	return (
-		<div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-			<div className="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
-				<form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-					{variant === "REGISTER" && (
+		<>
+			{isLoading && <Loader />}
+
+			<div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+				<div className="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
+					<form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+						{variant === "REGISTER" && (
+							<Input
+								label="Nome"
+								id="name"
+								type="text"
+								register={register}
+								errors={errors}
+								disabled={isLoading}
+								required
+							/>
+						)}
 						<Input
-							label="Nome"
-							id="name"
-							type="text"
+							label="Endereço de email"
+							id="email"
+							type="email"
 							register={register}
 							errors={errors}
 							disabled={isLoading}
 							required
 						/>
-					)}
-					<Input
-						label="Endereço de email"
-						id="email"
-						type="email"
-						register={register}
-						errors={errors}
-						disabled={isLoading}
-						required
-					/>
-					<Input
-						label="Palavra-passe"
-						id="password"
-						type="password"
-						register={register}
-						errors={errors}
-						disabled={isLoading}
-						required
-					/>
-					<div>
-						<Button type="submit" fullWidth disabled={isLoading}>
-							{variant === "LOGIN" ? "Iniciar sessão" : "Registrar"}
-						</Button>
-					</div>
-				</form>
-
-				<div className="mt-6">
-					<div className="relative">
-						<div className="absolute inset-0 flex items-center">
-							<div className="w-full border-t border-gray-200" />
+						<Input
+							label="Palavra-passe"
+							id="password"
+							type="password"
+							register={register}
+							errors={errors}
+							disabled={isLoading}
+							required
+						/>
+						<div>
+							<Button type="submit" fullWidth disabled={isLoading}>
+								{variant === "LOGIN" ? "Iniciar sessão" : "Registrar"}
+							</Button>
 						</div>
-						<div className="relative flex justify-center text-sm">
-							<span className="bg-white px-2 text-gray-500">Ou continue com</span>
+					</form>
+
+					<div className="mt-6">
+						<div className="relative">
+							<div className="absolute inset-0 flex items-center">
+								<div className="w-full border-t border-gray-200" />
+							</div>
+							<div className="relative flex justify-center text-sm">
+								<span className="bg-white px-2 text-gray-500">Ou continue com</span>
+							</div>
+						</div>
+
+						<div className="mt-6 flex gap-2">
+							<AuthSocialButton
+								icon={BsGoogle}
+								onClick={() => socialAction("google")}
+							/>
+							<AuthSocialButton
+								icon={BsGithub}
+								onClick={() => socialAction("github")}
+							/>
 						</div>
 					</div>
 
-					<div className="mt-6 flex gap-2">
-						<AuthSocialButton icon={BsGoogle} onClick={() => socialAction("google")} />
-						<AuthSocialButton icon={BsGithub} onClick={() => socialAction("github")} />
-					</div>
-				</div>
-
-				<div className="flex justify-center gap-1 mt-6 px-2 text-sm text-gray-500">
-					<div>
-						{variant === "LOGIN" ? "É novo ao Mossanger?" : "Já possui uma conta?"}
-					</div>
-					<div className="underline cursor-pointer" onClick={toggleVariant}>
-						{variant === "LOGIN" ? "Crie uma conta" : "Inicie a sessão"}
+					<div className="flex justify-center gap-1 mt-6 px-2 text-sm text-gray-500">
+						<div>
+							{variant === "LOGIN" ? "É novo ao Mossanger?" : "Já possui uma conta?"}
+						</div>
+						<div className="underline cursor-pointer" onClick={toggleVariant}>
+							{variant === "LOGIN" ? "Crie uma conta" : "Inicie a sessão"}
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 

@@ -13,6 +13,7 @@ import Modal from "./Modal";
 import Input from "../inputs/Input";
 import ImageInput from "../inputs/ImageInput";
 import Button from "../Button";
+import Loader from "../Loader";
 
 interface SettingsModalProps {
 	currentUser: User;
@@ -69,55 +70,61 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ currentUser, isOpen, onCl
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose}>
-			<form onSubmit={handleSubmit(onSubmit)}>
-				<div className="space-y-12">
-					<div className="border-b border-gray-900/10 pb-12">
-						<h2 className="text-base font-semibold leading-7 text-gray-900">Perfil</h2>
-						<p className="mt-1 text-sm leading-6 text-gray-500">
-							Altere dados relacionados com o seu perfil.
-						</p>
+		<>
+			{isLoading && <Loader />}
 
-						<div className="flex flex-col gap-y-8 mt-10">
-							<Input
-								label="Nome"
-								id="name"
-								disabled={isLoading}
-								errors={errors}
-								register={register}
-								required
-							/>
-							<Input
-								label="Email"
-								id="email"
-								type="email"
-								disabled={isLoading}
-								errors={errors}
-								register={register}
-								required
-							/>
-							<ImageInput
-								label="Foto"
-								placeholder={image || currentUser?.image}
-								disabled={isLoading}
-								errors={errors}
-								register={register}
-								onUpload={handleUpload}
-							/>
+			<Modal isOpen={isOpen} onClose={onClose}>
+				<form onSubmit={handleSubmit(onSubmit)}>
+					<div className="space-y-12">
+						<div className="border-b border-gray-900/10 pb-12">
+							<h2 className="text-base font-semibold leading-7 text-gray-900">
+								Perfil
+							</h2>
+							<p className="mt-1 text-sm leading-6 text-gray-500">
+								Altere dados relacionados com o seu perfil.
+							</p>
+
+							<div className="flex flex-col gap-y-8 mt-10">
+								<Input
+									label="Nome"
+									id="name"
+									disabled={isLoading}
+									errors={errors}
+									register={register}
+									required
+								/>
+								<Input
+									label="Email"
+									id="email"
+									type="email"
+									disabled={isLoading}
+									errors={errors}
+									register={register}
+									required
+								/>
+								<ImageInput
+									label="Foto"
+									placeholder={image || currentUser?.image}
+									disabled={isLoading}
+									errors={errors}
+									register={register}
+									onUpload={handleUpload}
+								/>
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<div className="flex items-center justify-end gap-x-6 mt-6">
-					<Button disabled={isLoading} onClick={onClose} secondary>
-						Cancelar
-					</Button>
-					<Button type="submit" disabled={isLoading} onClick={onClose}>
-						Guardar
-					</Button>
-				</div>
-			</form>
-		</Modal>
+					<div className="flex items-center justify-end gap-x-6 mt-6">
+						<Button disabled={isLoading} onClick={onClose} secondary>
+							Cancelar
+						</Button>
+						<Button type="submit" disabled={isLoading} onClick={onClose}>
+							Guardar
+						</Button>
+					</div>
+				</form>
+			</Modal>
+		</>
 	);
 };
 
